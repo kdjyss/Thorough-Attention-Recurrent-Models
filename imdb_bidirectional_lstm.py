@@ -64,25 +64,25 @@ y_train = np.array(y_train)
 y_valid = np.array(y_valid)
 y_test = np.array(y_test)
 
-X_train = X_train[:1000]
-y_train = y_train[:1000]
-X_test = X_test[300:400]
-y_test= y_test[300:400]
+# X_train = X_train[:1000]
+# y_train = y_train[:1000]
+# X_test = X_test[300:400]
+# y_test= y_test[300:400]
 
 print('Build model...')
 model = Graph()
 model.add_input(name='input', input_shape=(maxlen,), dtype=int)
 model.add_node(Embedding(max_features, embedding_size, input_length=maxlen),
                name='embedding', input='input')
-model.add_node(LSTM(64), name='forward', input='embedding')
-# model.add_node(LSTM(64,return_sequences=True), name='forward', input='embedding')
-# model.add_node(TimeDistributedDense(64),name='forwardW',input='forward')
-model.add_node(LSTM(64, go_backwards=True), name='backward', input='embedding')
-# model.add_node(LSTM(64,return_sequences=True, go_backwards=True), name='backward', input='embedding')
-# model.add_node(TimeDistributedDense(64),name='backwardW',input='backward')
-# model.add_node(LSTM(64),name='lstm',merge_mode='sum',inputs=['forwardW', 'backwardW'])
-# model.add_node(Dropout(0.5), name='dropout', input='lstm')
-model.add_node(Dropout(0.5), name='dropout', merge_mode='ave',inputs=['forward', 'backward'])
+# model.add_node(LSTM(64), name='forward', input='embedding')
+model.add_node(LSTM(64,return_sequences=True), name='forward', input='embedding')
+model.add_node(TimeDistributedDense(64),name='forwardW',input='forward')
+# model.add_node(LSTM(64, go_backwards=True), name='backward', input='embedding')
+model.add_node(LSTM(64,return_sequences=True, go_backwards=True), name='backward', input='embedding')
+model.add_node(TimeDistributedDense(64),name='backwardW',input='backward')
+model.add_node(LSTM(64),name='lstm',merge_mode='sum',inputs=['forwardW', 'backwardW'])
+model.add_node(Dropout(0.5), name='dropout', input='lstm')
+# model.add_node(Dropout(0.5), name='dropout', merge_mode='ave',inputs=['forward', 'backward'])
 model.add_node(Dense(1, activation='sigmoid'), name='sigmoid', input='dropout')
 model.add_output(name='output', input='sigmoid')
 
